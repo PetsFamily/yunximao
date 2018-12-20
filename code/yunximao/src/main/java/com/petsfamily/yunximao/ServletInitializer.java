@@ -1,4 +1,4 @@
-package com.petsfamily.qqyunximao;
+package com.petsfamily.yunximao;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

@@ -1,4 +1,4 @@
-package com.petsfamily.qqyunximao;
+package com.petsfamily.yunximao;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
