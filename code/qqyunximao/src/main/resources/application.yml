@@ -1,0 +1,9 @@
+server:
+  port: 8080
+logging:
+   path: /Users/zhangxun/Downloads/log
+   level:
+      com.petsfamily.qqyunximao : ERROR 
+spring:
+    application:
+        name: qqyunximao-service
