@@ -1,4 +1,4 @@
-package com.petsfamily.yunximao;
+package com.petsfamily.yunximao.wechatService;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

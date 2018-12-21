@@ -9,11 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.petsfamily</groupId>
-	<artifactId>yunximao</artifactId>
+	<artifactId>yunximao-wechat-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>yunximao</name>
-	<description>yunximao</description>
+	<name>yunximao-wechat-service</name>
+	<description>yunximao-wechat-service</description>
 
 	<properties>
 		<java.version>1.8</java.version>
