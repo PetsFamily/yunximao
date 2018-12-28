@@ -1,4 +1,4 @@
-package com.petsfamily.yunximao.wechatService.common.model;
+package com.petsfamily.yunximao.common.model;
 
 /**
  * 返回参数对象

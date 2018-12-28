@@ -1,4 +1,4 @@
-package com.petsfamily.yunximao.wechatService.common.model;
+package com.petsfamily.yunximao.common.model;
 /**
  * 请求参数对象
  * @author zhangxun
