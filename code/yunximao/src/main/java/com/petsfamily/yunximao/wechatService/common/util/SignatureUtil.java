@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class SignatureUtil {
 	// 此处的token即为微信接口配置填写的签名
-    private static final String TOKEN = "weixin";
+    private static final String TOKEN = "qqyunximao";
     /**
      * 验证签名
      * @param signature
