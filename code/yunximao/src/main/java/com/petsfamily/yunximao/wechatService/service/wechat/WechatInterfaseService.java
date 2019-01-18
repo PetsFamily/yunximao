@@ -8,5 +8,5 @@ import com.alibaba.fastjson.JSONObject;
 
 public interface WechatInterfaseService {
 	public JSONObject getAccessToken() throws ClientProtocolException, IOException;
-	public JSONObject getUserInfo(String openid,String unionid) throws ClientProtocolException, IOException;
+	public JSONObject getUserInfo(String openid) throws ClientProtocolException, IOException;
 }

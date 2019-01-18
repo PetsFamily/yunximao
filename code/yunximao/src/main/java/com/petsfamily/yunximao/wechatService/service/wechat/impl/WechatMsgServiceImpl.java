@@ -1,19 +1,25 @@
 package com.petsfamily.yunximao.wechatService.service.wechat.impl;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.petsfamily.yunximao.common.util.DateTimeUtil;
 import com.petsfamily.yunximao.wechatService.common.model.TextMessage;
 import com.petsfamily.yunximao.wechatService.common.model.WeChatBaseMessage;
 import com.petsfamily.yunximao.wechatService.common.model.WeChatResult;
-import com.petsfamily.yunximao.wechatService.controller.wechat.WechatController;
+import com.petsfamily.yunximao.wechatService.service.wechat.WechatInterfaseService;
 import com.petsfamily.yunximao.wechatService.service.wechat.WechatMsgService;
 @Service
 public class WechatMsgServiceImpl implements WechatMsgService {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
+	@Resource
+	private WechatInterfaseService wechatInterfaseService;
 	
 	/*
      * TODO
@@ -146,8 +152,29 @@ public class WechatMsgServiceImpl implements WechatMsgService {
      */
     @Override
     public WeChatResult subscribe(Map<String, String> params, WeChatBaseMessage msgInfo) {
-        logger.debug("开始调用关注回复服务");
-        return null;
+    	 String openId = msgInfo.getFromUserName();
+         WeChatResult result = new WeChatResult();
+         if(StringUtils.isNotBlank(openId)) {
+        	 logger.debug("订阅用户openId:"+openId);
+        	 try {
+        		JSONObject user = wechatInterfaseService.getUserInfo(openId);
+        		logger.debug(user.toJSONString());
+        		TextMessage text = new TextMessage();
+  		        text.setContent("欢迎光临,精彩尽请期待!");// 自动回复
+  		        text.setCreateTime(DateTimeUtil.currentTime());
+  		        text.setToUserName(msgInfo.getFromUserName());
+  		        text.setFromUserName(msgInfo.getToUserName());
+  		        text.setMsgId(msgInfo.getMsgId());
+  		        text.setMsgType("text");
+  		        result.setObject(text);
+        	 }catch (Exception e) {
+				e.printStackTrace();
+				logger.debug("获取用户信息异常:"+openId);
+			}
+         }else {
+        	 logger.debug("订阅用户openId获取失败");
+         }
+         return result;
     }
 
     /*

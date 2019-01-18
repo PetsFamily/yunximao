@@ -27,7 +27,7 @@ public class WechatInterfaseServiceImpl implements WechatInterfaseService{
 	}
 
 	@Override
-	public JSONObject getUserInfo(String openid, String unionid) throws ClientProtocolException, IOException{
+	public JSONObject getUserInfo(String openid) throws ClientProtocolException, IOException{
 		String url = WechatConstant.ROOT+
 				"/cgi-bin/user/info"
 				+ "?access_token="+WechatConstant.ACCESS_TOKEN
