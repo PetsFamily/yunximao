@@ -25,6 +25,7 @@ public class WechatInterfaseServiceImpl implements WechatInterfaseService{
 		String response = HttpClient.get(url);
 		return JSONObject.parseObject(response);
 	}
+	
 
 	@Override
 	public JSONObject getUserInfo(String openid) throws ClientProtocolException, IOException{

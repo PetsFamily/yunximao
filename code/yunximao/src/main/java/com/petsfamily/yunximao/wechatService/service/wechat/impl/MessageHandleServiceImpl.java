@@ -26,7 +26,6 @@ public class MessageHandleServiceImpl implements MessageHandleService {
      */
     @Override
     public String handleMessage(Map<String, String> params) throws Exception {
-        logger.debug("开始处理【message】信息");
         String result = null;
         if (params != null && params.size() > 0) {
             WeChatBaseMessage msgInfo = new WeChatBaseMessage();

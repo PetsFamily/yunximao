@@ -31,7 +31,6 @@ public class WechatController extends BaseController{
         this.getResponse().setCharacterEncoding("UTF-8");
         boolean ispost = Objects.equals("POST", this.getRequest().getMethod().toUpperCase());
         if(ispost) {
-        	 logger.debug("接收成功，正在处理逻辑");
         	 InputStream inputStream = this.getRequest().getInputStream();
              Map<String, String> params = XmlUtil.doXMLParse(inputStream);
              String respXml = messageHandleService.handleMessage(params);
