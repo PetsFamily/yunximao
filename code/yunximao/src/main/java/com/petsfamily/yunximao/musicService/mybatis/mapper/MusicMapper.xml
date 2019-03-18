@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petsfamily.yunximao.musicService.mybatis.dao.MusicMapper">
+	<select id="selectAllRecommend" resultType="hashmap" parameterType="hashmap">
+		select 
+			 mi.music_number as id,
+			 mi.music_title as title,
+			 mi.music_image as image,
+			 mi.singer as singer,
+			 mi.url as url,
+			 case
+			 	when mci.seq_id is null then 0
+			 	else 1
+			 end as isCollect
+		from 
+		music_info mi 
+		left join music_collect_info mci on mci.music_number = mi.music_number and mci.is_delete = 0
+		where mi.is_delete = 0 and mi.recommend is not null
+		order by mi.recommend desc
+	</select>
+	
+	<select id="selectAllMusicByPage" resultType="hashmap" parameterType="hashmap">
+		select 
+			 mi.music_number as id,
+			 mi.music_title as title,
+			 mi.music_image as image,
+			 mi.singer as singer,
+			 mi.url as url,
+			 case
+			 	when mci.seq_id is null then 0
+			 	else 1
+			 end as isCollect
+		from 
+		music_info mi
+		left join music_collect_info mci on mci.music_number = mi.music_number and mci.is_delete = 0
+		where mi.is_delete = 0 
+		<if test="seach != null" >
+			and (music_title like  CONCAT('%','${seach}','%' ) 
+			or singer like  CONCAT('%','${seach}','%' ))
+		</if>
+		order by mi.seq_id desc
+		<if test="limit != null">
+     		<if test="offset != null">
+        		limit ${offset}, ${limit}
+      		</if>
+		    <if test="offset == null">
+		        limit ${limit}
+		    </if>
+    	</if>
+	</select>
+	
+	<select id="selectMyMusicByPage" resultType="hashmap" parameterType="hashmap">
+		select 
+			 mi.music_number as id,
+			 mi.music_title as title,
+			 mi.music_image as image,
+			 mi.singer as singer,
+			 mi.url as url,
+			 1 as isCollect
+		from 
+		music_info mi 
+		left join music_collect_info mci on mci.music_number = mi.music_number
+		where mi.is_delete = 0 and mci.seq_id is not null and mci.is_delete = 0
+		<if test="seach != null" >
+			and (music_title like  CONCAT('%','${seach}','%' ) 
+			or singer like  CONCAT('%','${seach}','%' ))
+		</if>
+		order by mi.seq_id desc
+		<if test="limit != null">
+     		<if test="offset != null">
+        		limit ${offset}, ${limit}
+      		</if>
+		    <if test="offset == null">
+		        limit ${limit}
+		    </if>
+    	</if>
+	</select>
+</mapper>

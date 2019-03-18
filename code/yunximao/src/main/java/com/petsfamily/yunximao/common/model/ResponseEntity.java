@@ -55,6 +55,12 @@ public class ResponseEntity {
 		response.setMsg(FAIL_MSG);
 		return response;
 	}
+	public static ResponseEntity buildFailly(String msg) {
+		ResponseEntity response = new ResponseEntity();
+		response.setCode(FAIL_CODE);
+		response.setMsg(msg);
+		return response;
+	}
 	
 	
 	

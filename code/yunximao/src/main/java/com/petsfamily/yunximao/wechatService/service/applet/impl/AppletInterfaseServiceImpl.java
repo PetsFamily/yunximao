@@ -84,7 +84,9 @@ public class AppletInterfaseServiceImpl implements AppletInterfaseService {
             byte[] resultByte = cipher.doFinal(dataByte);
             if (null != resultByte && resultByte.length > 0) {
                 String result = new String(resultByte, "UTF-8");
-                return JSONObject.parseObject(result);
+                JSONObject resultJson = JSONObject.parseObject(result);
+                resultJson.put("sessionKey", sessionKey.getString("session_key"));//一定不要返回给前端
+                return resultJson;
             }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

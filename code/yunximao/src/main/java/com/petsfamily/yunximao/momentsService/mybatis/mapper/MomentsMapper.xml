@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petsfamily.yunximao.momentsService.mybatis.dao.MomentsMapper">
+		<select id="selectMomentListByPage" resultType="hashmap" parameterType="hashmap">
+			SELECT 
+				pm.moment_number as id,
+				pm.moment_content as momentContent,
+				pm.moment_type as momentType,
+				pm.moment_title as title,
+				ui.avatar_url as head,
+				ui.user_name as userName,
+				pm.favorites_count as favoritesCount,
+				pm.comments_count as commentsCount,
+				'1' as isLike
+				FROM 
+				pet_moments_info pm
+			left join user_info ui on pm.user_number = ui.user_number
+			where pm.is_delete = 0 and pm.is_pass = 1
+			<if test="seach != null" >
+				and (pm.moment_title like  CONCAT('%','${seach}','%' ) 
+				or pm.key_word like  CONCAT('%','${seach}','%' )
+				or ui.user_name like  CONCAT('%','${seach}','%' ))
+			</if>
+			order by pm.seq_id desc
+			<if test="limit != null">
+	     		<if test="offset != null">
+	        		limit ${offset}, ${limit}
+	      		</if>
+			    <if test="offset == null">
+			        limit ${limit}
+			    </if>
+	    	</if>
+		</select>
+		<update id="addReadNum" parameterType="String">
+			update pet_moments_info set read_count = ifnull(read_count,0) + 1 
+							  where moment_number  = #{momentNumber}	
+		</update>
+		<update id="addLikeNum" parameterType="String">
+			update pet_moments_info set like_count = ifnull(like_count,0) + 1 
+							  where moment_number  = #{momentNumber}	
+		</update>
+		
+		<update id="addCommentsCount" parameterType="String">
+			update pet_moments_info set comments_count = ifnull(comments_count,0) + 1 
+							  where moment_number  = #{momentNumber}	
+		</update>
+
+		<insert id="saveLikeLog" parameterType="com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsLikeLog">
+		    <selectKey keyProperty="seqId" order="AFTER" resultType="java.lang.Integer">
+		      SELECT LAST_INSERT_ID()
+		    </selectKey>
+		    insert ignore into pet_moments_like_log (user_number, pet_number, moment_number, 
+		      is_delete, remark, create_user, 
+		      update_user, create_date, update_date
+		      )
+		    values (#{userNumber,jdbcType=VARCHAR}, #{petNumber,jdbcType=VARCHAR}, #{momentNumber,jdbcType=VARCHAR}, 
+		      #{isDelete,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
+		      #{updateUser,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}
+		      )
+	   </insert>
+	   
+	   <select id="selectCommentsListByPage" resultType="hashmap" parameterType="hashmap">
+	  		select 
+			   mc.comment_number as id,
+			   mc.comment_content as content,
+			   mc.create_date as commentDate,
+			   ui.avatar_url as head,
+			   ui.user_name as userName
+			from 
+			pet_moments_comments_info mc 
+			left join user_info ui on mc.user_number = ui.user_number
+			where mc.is_delete = 0 
+			and mc.moment_number = #{momentNumber}
+			order by mc.seq_id desc 
+			<if test="limit != null">
+		    		<if test="offset != null">
+		       		limit ${offset}, ${limit}
+		     		</if>
+			    <if test="offset == null">
+			        limit ${limit}
+			    </if>
+		   	</if>
+		</select>
+	   
+	   
+</mapper>

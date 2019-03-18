@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 import com.petsfamily.yunximao.common.model.BaseController;
 import com.petsfamily.yunximao.common.model.ResponseEntity;
+import com.petsfamily.yunximao.userService.service.UserService;
 import com.petsfamily.yunximao.wechatService.service.applet.AppletInterfaseService;
 
 @RestController
@@ -20,10 +21,17 @@ public class AppletUserController extends BaseController{
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Resource
 	private AppletInterfaseService appletInterfaseService;
+	@Resource
+	private UserService userService;
 	
-	@RequestMapping(value = "/createUser", method = {RequestMethod.POST })
+	@RequestMapping(value = "/user/createUser", method = {RequestMethod.POST })
 	public ResponseEntity createUser(@RequestBody JSONObject dataJson) throws Exception {
-		logger.debug(appletInterfaseService.getUserInfo(dataJson).toJSONString());
-		return ResponseEntity.buildSuccessful();
+		JSONObject userData = appletInterfaseService.getUserInfo(dataJson);
+		return userService.createUserByWeChat(userData);
+	}
+	
+	@RequestMapping(value = "/user/modifyUser", method = {RequestMethod.POST })
+	public ResponseEntity modifyUser(@RequestBody JSONObject dataJson) throws Exception {
+		return userService.modifyUserInfo(dataJson);
 	}
 }

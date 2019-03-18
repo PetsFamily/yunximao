@@ -33,7 +33,6 @@ public class WechatMsgServiceImpl implements WechatMsgService {
     @Override
     public WeChatResult textMsgInfo(Map<String, String> params, WeChatBaseMessage msgInfo) {
         String content = params.get("Content").trim();
-        logger.debug("文本消息:"+content);
         WeChatResult result = new WeChatResult();
         switch (content) {
 			default:
@@ -157,8 +156,8 @@ public class WechatMsgServiceImpl implements WechatMsgService {
          if(StringUtils.isNotBlank(openId)) {
         	 logger.debug("订阅用户openId:"+openId);
         	 try {
-        		JSONObject user = wechatInterfaseService.getUserInfo(openId);
-        		logger.debug(user.toJSONString());
+        		//JSONObject user = wechatInterfaseService.getUserInfo(openId);
+        		//logger.debug(user.toJSONString());
         		TextMessage text = new TextMessage();
   		        text.setContent("欢迎光临,精彩尽请期待!");// 自动回复
   		        text.setCreateTime(DateTimeUtil.currentTime());
