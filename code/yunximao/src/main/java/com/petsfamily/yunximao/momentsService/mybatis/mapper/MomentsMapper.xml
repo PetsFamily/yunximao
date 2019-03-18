@@ -9,12 +9,18 @@
 				pm.moment_title as title,
 				ui.avatar_url as head,
 				ui.user_name as userName,
-				pm.favorites_count as favoritesCount,
+				pm.like_count as likeCount,
 				pm.comments_count as commentsCount,
-				'1' as isLike
+				case
+					when likeLog.seq_id is not null then '1'
+					else '0'
+				end as isLike
 				FROM 
 				pet_moments_info pm
 			left join user_info ui on pm.user_number = ui.user_number
+			<if test="userNumber != null" >
+			left join pet_moments_like_log likeLog on likeLog.user_number = #{userNumber} and pm.moment_number = likeLog.moment_number and likeLog.is_delete = 0
+			</if>
 			where pm.is_delete = 0 and pm.is_pass = 1
 			<if test="seach != null" >
 				and (pm.moment_title like  CONCAT('%','${seach}','%' ) 

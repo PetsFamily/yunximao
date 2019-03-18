@@ -73,10 +73,21 @@ public class MomentsServiceImpl implements MomentsService {
 		String dataSize = dataJson.getString("dataSize");
 		String seach = dataJson.getString("seach");
 		String tag = dataJson.getString("tag");//预留字段
+		String token = dataJson.getString("token");//预留埋点
 		if(StringUtils.isBlank(dataSize)||!StringUtils.isNumeric(dataSize)) {
 			dataSize = "0";
 		}
 		JSONObject parameter = new JSONObject();
+		if(StringUtils.isNotBlank(token)) {
+			UserInfo user = userService.getUserInfoByToken(token);
+			if(user!=null) {
+				parameter.put("userNumber",user.getUserNumber());
+			}else {
+				parameter.put("userNumber","none");
+			}
+		}else {
+			parameter.put("userNumber","none");
+		}
 		parameter.put("seach",seach);
 		parameter.put("offset", PageUtil.getOffset(Integer.valueOf(dataSize)));
 		parameter.put("limit", PageUtil.getLimit(Integer.valueOf(dataSize)));
