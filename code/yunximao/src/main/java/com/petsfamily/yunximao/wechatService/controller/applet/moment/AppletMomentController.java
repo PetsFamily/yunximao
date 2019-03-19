@@ -115,4 +115,16 @@ public class AppletMomentController extends BaseController{
 		dataJson.put("music",music);
 		return momentsService.submitVideo(dataJson);
 	}
+	
+	
+	@RequestMapping(value="/moment/videoCallback", method = { RequestMethod.POST})
+    public ResponseEntity videoCallback( @RequestParam("checksum") String checksum,
+	    								 @RequestParam("content") String content) {
+		logger.debug(content);
+		JSONObject dataJson = new JSONObject();
+		dataJson.put("checksum", checksum);
+		dataJson.put("content", content);
+		momentsService.callbackAuditVideo(dataJson);
+		return ResponseEntity.buildSuccessful();
+	}
 }

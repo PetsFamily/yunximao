@@ -36,6 +36,9 @@ public class ContentAuditUtil {
 	private String greenUrl;
 	@Value("${aliyun.RegionId}")
 	private String regionId;
+	@Value("${aliyun.videoCallback}")
+	private String videoCallback;
+	
 
 	public JSONObject auditImage(String dataId,String url){
 		 try {
@@ -117,7 +120,7 @@ public class ContentAuditUtil {
 	        JSONObject data = new JSONObject();
 	        data.put("scenes", Arrays.asList("porn"));
 	        data.put("audioScenes",Arrays.asList("antispam"));//语音反垃圾
-	        data.put("callback","");
+	        data.put("callback",videoCallback);
 	        data.put("seed","qqyunximao");
 	        data.put("tasks", tasks);
 	        videoAsyncScanRequest.setHttpContent(data.toJSONString().getBytes("UTF-8"),"UTF-8", FormatType.JSON);

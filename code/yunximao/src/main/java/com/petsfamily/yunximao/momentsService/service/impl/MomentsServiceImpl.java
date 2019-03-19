@@ -16,6 +16,8 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.bouncycastle.crypto.RuntimeCryptoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -656,5 +658,60 @@ public class MomentsServiceImpl implements MomentsService {
 			 }
 		}
 		return ResponseEntity.buildSuccessful();
+	}
+
+	@Override
+	@Transactional(rollbackFor={Throwable.class,RuntimeException.class} ,propagation=Propagation.REQUIRED)
+	public void callbackAuditVideo(JSONObject dataJson) {
+		String content = dataJson.getString("content");
+		if(StringUtils.isBlank(content)) {
+			throw new RuntimeException("请求数据错误");
+		}
+		JSONObject contentJson = JSON.parseObject(content);
+		if(contentJson.getInteger("code")==200) {
+			String dataId = contentJson.getString("dataId");
+			String taskId = contentJson.getString("taskId");
+			PetMomentsInfoExample example = new PetMomentsInfoExample();
+			example.createCriteria().andIsDeleteEqualTo(0).andTaskIdEqualTo(taskId).andMomentNumberEqualTo(dataId);
+			List<PetMomentsInfo> list = momentsInfoMapper.selectByExample(example);
+			if(list.isEmpty()) {
+				throw new RuntimeException("数据异常");
+			}else{
+				PetMomentsInfo	info = list.get(0);
+				
+				JSONArray audioScanResults = contentJson.getJSONArray("audioScanResults");
+				 JSONArray results = contentJson.getJSONArray("results");
+				 if(audioScanResults==null&&results==null) {
+					 throw new RuntimeException("处理中");
+				 }
+				 boolean audioPass = false;
+				 boolean pass = false;
+				 if(audioScanResults==null) {
+					 audioPass = true;
+				 }else {
+					 for (Object audioScanResult : audioScanResults) {
+						 if("pass".equals(((JSONObject)audioScanResult).getString("suggestion"))){
+							 audioPass = true;
+						 }
+					 }
+				 }
+				 for (Object result : results) {
+					 if("pass".equals(((JSONObject)result).getString("suggestion"))){
+						 pass = true;
+					 }
+				 }
+				 if(audioPass&&pass) {
+					 info.setIsPass(1);
+					 info.setUpdateDate(new Date());
+					 momentsInfoMapper.updateByPrimaryKeySelective(info);
+				 }else {
+					 info.setIsPass(0);
+					 info.setUpdateDate(new Date());
+					 momentsInfoMapper.updateByPrimaryKeySelective(info);
+				 }
+			}
+		}else {
+			throw new RuntimeException("审核结果异常");
+		}
 	}
 }

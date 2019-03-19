@@ -96,5 +96,11 @@ public interface MomentsService {
 	 * @return
 	 */
 	public ResponseEntity reAuditVideo(JSONObject dataJson);
+	/**
+	 * 视频审核结果 回调
+	 * @param dataJson
+	 * @return
+	 */
+	public void callbackAuditVideo(JSONObject dataJson);
 	
 }
