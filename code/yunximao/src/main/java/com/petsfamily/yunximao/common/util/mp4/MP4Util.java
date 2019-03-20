@@ -183,8 +183,8 @@ public class MP4Util {
 	         audio.setSamplingRate(new Integer(22050));
 	         VideoAttributes video = new VideoAttributes();
 	         video.setCodec("mpeg4");
-	         video.setBitRate(new Integer(800000));
-	         video.setFrameRate(new Integer(15));
+	         video.setBitRate(new Integer(1000000));
+	         video.setFrameRate(new Integer(24));
 	         EncodingAttributes attrs = new EncodingAttributes();
 	         attrs.setFormat("mp4");
 	         attrs.setAudioAttributes(audio);

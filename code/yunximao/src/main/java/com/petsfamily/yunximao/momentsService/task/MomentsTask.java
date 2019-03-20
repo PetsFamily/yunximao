@@ -20,7 +20,7 @@ public class MomentsTask {
 	 * @throws IOException 
 	 * @throws ClientProtocolException 
 	 * @throws InterruptedException */
-	@Scheduled(initialDelay = 5000,fixedDelay= 60 * 1000)
+	//@Scheduled(initialDelay = 5000,fixedDelay= 60 * 1000)
 	public void refreshAccessToken() throws ClientProtocolException, IOException, InterruptedException {
 		momentsService.reAuditVideo(null);
 	}

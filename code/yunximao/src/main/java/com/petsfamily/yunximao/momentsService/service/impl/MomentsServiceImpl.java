@@ -2,27 +2,19 @@ package com.petsfamily.yunximao.momentsService.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URI;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
-import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -44,7 +36,6 @@ import com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsLikeLog;
 import com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsLikeLogExample;
 import com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsReadLog;
 import com.petsfamily.yunximao.momentsService.service.MomentsService;
-import com.petsfamily.yunximao.musicService.mybatis.model.MusicInfo;
 import com.petsfamily.yunximao.musicService.service.MusicService;
 import com.petsfamily.yunximao.userService.mybatis.model.UserInfo;
 import com.petsfamily.yunximao.userService.service.UserService;
@@ -369,6 +360,7 @@ public class MomentsServiceImpl implements MomentsService {
 	@Override
 	@Transactional(rollbackFor={Throwable.class,RuntimeException.class} ,propagation=Propagation.REQUIRED)
 	public ResponseEntity submitVideoPic(JSONObject dataJson) {
+		
 		String token = dataJson.getString("token");
 		MultipartFile file = dataJson.getObject("file",MultipartFile.class);
 		String title = dataJson.getString("title");
@@ -455,7 +447,6 @@ public class MomentsServiceImpl implements MomentsService {
 				return ResponseEntity.buildFailly("输入内容有违规情况");
 			}
 			
-			
 			PetMomentsInfo moment = new PetMomentsInfo();
 			moment.setIsDelete(0);
 			moment.setIsPass(-1);//初始化 未知
@@ -481,27 +472,8 @@ public class MomentsServiceImpl implements MomentsService {
 			
 			String module = "moments/video";
 			String name = moment.getMomentNumber() +"."+ file.getOriginalFilename().split("\\.")[file.getOriginalFilename().split("\\.").length-1];
-			String ImgName = moment.getMomentNumber() +"_pic.png";
-			
-			String ImgUrl = "";
-			try {
-				ImgUrl = fileUtil.saveByAliOSS(module+"/"+ImgName,new FileInputStream(MP4Util.getVideoThumbTemp(source)));
-			}catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("文件上传失败");
-			}
-			moment.setMomentContent(ImgUrl);
-			momentsInfoMapper.updateByPrimaryKeySelective(moment);
-			
 			
 			if(StringUtils.isNotBlank(music)&&"mp4".equals(name.split("\\.")[1].toLowerCase())) {//有背景音乐 且 视频格式为MP4 则合成 
-				//保存未合成的视频
-				//String tempMp4Name = moment.getMomentNumber() +"temp."+ file.getOriginalFilename().split("\\.")[file.getOriginalFilename().split("\\.").length-1];
-				//String url = "";
-				//url = fileUtil.saveByAliOSS(module+"/"+tempMp4Name, new FileInputStream(MP4Util.getCompressVideo(source)));
-				//if(StringUtils.isBlank(url)) {
-					//throw new RuntimeException("文件上传失败");
-				//}
 				//合成视频
 				File mp3 = fileUtil.getByAliOSS("music/"+music+".aac");
 			    File mp4 = MP4Util.getCompressVideo(source);
@@ -515,6 +487,15 @@ public class MomentsServiceImpl implements MomentsService {
 			    moment.setMomentVideo(outUrl);
 			    JSONObject auditRtn = audit.auditVideo(moment.getMomentNumber(), outUrl);
 			    if(auditRtn!=null) {
+			    	String ImgName = moment.getMomentNumber() +"_pic.png";
+			    	String ImgUrl = "";
+					try {
+						ImgUrl = fileUtil.saveByAliOSS(module+"/"+ImgName,new FileInputStream(MP4Util.getVideoThumbTemp(outMap4)));
+					}catch (Exception e) {
+						e.printStackTrace();
+						throw new RuntimeException("文件上传失败");
+					}
+					moment.setMomentContent(ImgUrl);
 					moment.setTaskId(auditRtn.getString("taskId"));
 					if(200 != auditRtn.getInteger("code")) {//同步失败 直接 认定 不通过
 						moment.setIsPass(0);
@@ -527,9 +508,11 @@ public class MomentsServiceImpl implements MomentsService {
 			    
 			}else {
 				String url = "";
+				File out = source;
 				if("mp4".equals(name.split("\\.")[1].toLowerCase())) {
+					out = MP4Util.getCompressVideo(source);
 					try {
-						url = fileUtil.saveByAliOSS(module+"/"+name,new FileInputStream(MP4Util.getCompressVideo(source)));
+						url = fileUtil.saveByAliOSS(module+"/"+name,new FileInputStream(out));
 					}catch (Exception e) {
 						throw new RuntimeException("文件上传失败");
 					}
@@ -542,6 +525,15 @@ public class MomentsServiceImpl implements MomentsService {
 				}				
 				JSONObject auditRtn = audit.auditVideo(moment.getMomentNumber(), url);
 				if(auditRtn!=null) {
+					String ImgName = moment.getMomentNumber() +"_pic.png";
+			    	String ImgUrl = "";
+					try {
+						ImgUrl = fileUtil.saveByAliOSS(module+"/"+ImgName,new FileInputStream(MP4Util.getVideoThumbTemp(out)));
+					}catch (Exception e) {
+						e.printStackTrace();
+						throw new RuntimeException("文件上传失败");
+					}
+					moment.setMomentContent(ImgUrl);
 					moment.setMomentVideo(url);
 					moment.setTaskId(auditRtn.getString("taskId"));
 					if(200 != auditRtn.getInteger("code")) {//同步失败 直接 认定 不通过
