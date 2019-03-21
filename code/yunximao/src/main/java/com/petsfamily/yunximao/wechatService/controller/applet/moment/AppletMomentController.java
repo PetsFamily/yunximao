@@ -48,6 +48,25 @@ public class AppletMomentController extends BaseController{
 		momentsService.readMoment(dataJson);
 		return momentsService.queryMomentInfo(dataJson);
 	}
+	
+	@RequestMapping(value = "/moment/queryTotalReadNum", method = {RequestMethod.POST })
+	public ResponseEntity queryTotalReadNum(@RequestBody JSONObject dataJson) throws Exception {
+		String token = dataJson.getString("token");
+		dataJson = new JSONObject();
+		dataJson.put("token",token);
+		ResponseEntity response = momentsService.queryTotalReadNum(dataJson);
+		return response;
+	}
+	
+	@RequestMapping(value = "/moment/queryMomentNum", method = {RequestMethod.POST })
+	public ResponseEntity queryMomentNum(@RequestBody JSONObject dataJson) throws Exception {
+		String token = dataJson.getString("token");
+		dataJson = new JSONObject();
+		dataJson.put("token",token);
+		ResponseEntity response = momentsService.queryMomentNum(dataJson);
+		return response;
+	}
+	
 	@RequestMapping(value = "/moment/like", method = {RequestMethod.POST })
 	public ResponseEntity like(@RequestBody JSONObject dataJson) throws Exception {
 		String id = dataJson.getString("id");

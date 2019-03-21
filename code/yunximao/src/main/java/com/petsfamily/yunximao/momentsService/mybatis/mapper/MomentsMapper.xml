@@ -41,6 +41,9 @@
 			update pet_moments_info set read_count = ifnull(read_count,0) + 1 
 							  where moment_number  = #{momentNumber}	
 		</update>
+		<select id="totalReadNum" parameterType="String" resultType="Integer">
+				select IFNULL(sum(IFNULL(read_count,0)),0) from pet_moments_info where user_number  = #{userNumber}
+		</select>
 		<update id="addLikeNum" parameterType="String">
 			update pet_moments_info set like_count = ifnull(like_count,0) + 1 
 							  where moment_number  = #{momentNumber}	

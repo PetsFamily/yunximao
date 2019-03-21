@@ -103,4 +103,13 @@ public interface MomentsService {
 	 */
 	public void callbackAuditVideo(JSONObject dataJson);
 	
+	/**
+	 * 统计用户总播放量
+	 * @param dataJson
+	 * @return
+	 */
+	public ResponseEntity queryTotalReadNum(JSONObject dataJson);
+	
+	public ResponseEntity queryMomentNum(JSONObject dataJson);
+	
 }

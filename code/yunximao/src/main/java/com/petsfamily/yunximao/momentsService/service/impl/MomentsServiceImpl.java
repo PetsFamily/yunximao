@@ -125,10 +125,13 @@ public class MomentsServiceImpl implements MomentsService {
 				UserInfo reader = userService.getUserInfoByToken(token);
 				if(reader!=null) {
 					data.put("isLike",this.isLike(momentNumber,reader.getUserNumber()));
+					data.put("isUnfollow",!userService.isFriend(reader.getUserNumber(),momentsInfo.getUserNumber()));
 				}else {
+					data.put("isUnfollow",true);
 					data.put("isLike",false);
 				}
 			}else {
+				data.put("isUnfollow",true);
 				data.put("isLike",false);
 			}
 			return ResponseEntity.buildSuccessful(data);
@@ -705,5 +708,33 @@ public class MomentsServiceImpl implements MomentsService {
 		}else {
 			throw new RuntimeException("审核结果异常");
 		}
+	}
+
+	@Override
+	public ResponseEntity queryTotalReadNum(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		if(StringUtils.isBlank(token)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = userService.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		return ResponseEntity.buildSuccessful(momentsMapper.totalReadNum(user.getUserNumber()));
+	}
+
+	@Override
+	public ResponseEntity queryMomentNum(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		if(StringUtils.isBlank(token)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = userService.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		PetMomentsInfoExample example = new PetMomentsInfoExample();
+		example.createCriteria().andIsDeleteEqualTo(0).andUserNumberEqualTo(user.getUserNumber());
+		return ResponseEntity.buildSuccessful(momentsInfoMapper.countByExample(example));
 	}
 }

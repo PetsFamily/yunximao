@@ -34,4 +34,25 @@ public class AppletUserController extends BaseController{
 	public ResponseEntity modifyUser(@RequestBody JSONObject dataJson) throws Exception {
 		return userService.modifyUserInfo(dataJson);
 	}
+	
+	@RequestMapping(value = "/user/addFriend", method = {RequestMethod.POST })
+	public ResponseEntity addFriend(@RequestBody JSONObject dataJson) throws Exception {
+		return userService.addFriend(dataJson);
+	}
+	
+	@RequestMapping(value = "/user/deleFriend", method = {RequestMethod.POST })
+	public ResponseEntity deleFriend(@RequestBody JSONObject dataJson) throws Exception {
+		return userService.deleFriend(dataJson);
+	}
+	
+	@RequestMapping(value = "/user/queryFriendNum", method = {RequestMethod.POST })
+	public ResponseEntity queryFriendNum(@RequestBody JSONObject dataJson) throws Exception {
+		String token = dataJson.getString("token");
+		dataJson = new JSONObject();
+		dataJson.put("token",token);
+		ResponseEntity response = userService.queryFriendNum(dataJson);
+		return response;
+	}
+	
+	
 }

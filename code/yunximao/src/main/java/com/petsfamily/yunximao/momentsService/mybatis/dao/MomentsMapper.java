@@ -11,10 +11,13 @@ public interface MomentsMapper {
 	
 	public int addReadNum(String momentNumber);
 	
+	public int totalReadNum(String userNumber);
+	
 	public int addLikeNum(String momentNumber);
 	
 	public int addCommentsCount(String momentNumber);
 	
 	public int saveLikeLog(PetMomentsLikeLog likeLog);
+	
 	
 }

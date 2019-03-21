@@ -20,9 +20,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.petsfamily.yunximao.common.model.ResponseEntity;
 import com.petsfamily.yunximao.common.util.DateTimeUtil;
+import com.petsfamily.yunximao.userService.mybatis.dao.UserFriendInfoMapper;
 import com.petsfamily.yunximao.userService.mybatis.dao.UserInfoMapper;
 import com.petsfamily.yunximao.userService.mybatis.dao.UserTokenInfoMapper;
 import com.petsfamily.yunximao.userService.mybatis.dao.WechatInfoMapper;
+import com.petsfamily.yunximao.userService.mybatis.model.UserFriendInfo;
+import com.petsfamily.yunximao.userService.mybatis.model.UserFriendInfoExample;
 import com.petsfamily.yunximao.userService.mybatis.model.UserInfo;
 import com.petsfamily.yunximao.userService.mybatis.model.UserInfoExample;
 import com.petsfamily.yunximao.userService.mybatis.model.UserTokenInfo;
@@ -34,6 +37,8 @@ import com.petsfamily.yunximao.userService.service.UserService;
 public class UserServiceImpl implements UserService {
 	@Resource
 	private UserInfoMapper userMapper;
+	@Resource
+	private UserFriendInfoMapper friendInfoMapper;
 	@Resource
 	private WechatInfoMapper wechatMapper;
 	@Resource
@@ -241,5 +246,93 @@ public class UserServiceImpl implements UserService {
 	public ResponseEntity modifyUserHeadImg(JSONObject dataJson) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public ResponseEntity addFriend(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		String friendNumber = dataJson.getString("friendNumber");
+		if(StringUtils.isBlank(token)||StringUtils.isBlank(friendNumber)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = this.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("用户信息非法");
+		}
+		UserFriendInfoExample example = new UserFriendInfoExample();
+		example.createCriteria()
+				.andIsDeleteEqualTo(0)
+				.andUserNumberEqualTo(user.getUserNumber())
+				.andFriendNumberEqualTo(friendNumber);
+		if(friendInfoMapper.countByExample(example)>0) {
+			return ResponseEntity.buildSuccessful();
+		}else {
+			UserFriendInfo friend = new UserFriendInfo();
+			friend.setIsDelete(0);
+			friend.setCreateUser(user.getUserNumber());
+			friend.setCreateDate(new Date());
+			friend.setUserNumber(user.getUserNumber());
+			friend.setFriendNumber(friendNumber);
+			friendInfoMapper.insert(friend);
+			return ResponseEntity.buildSuccessful();
+		}
+	}
+
+	@Override
+	public ResponseEntity deleFriend(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		String friendNumber = dataJson.getString("friendNumber");
+		if(StringUtils.isBlank(token)||StringUtils.isBlank(friendNumber)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = this.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("用户信息非法");
+		}
+		UserFriendInfoExample example = new UserFriendInfoExample();
+		example.createCriteria()
+				.andIsDeleteEqualTo(0)
+				.andUserNumberEqualTo(user.getUserNumber())
+				.andFriendNumberEqualTo(friendNumber);
+		UserFriendInfo record = new UserFriendInfo();
+		record.setIsDelete(1);
+		record.setUpdateDate(new Date());
+		record.setUpdateUser(user.getUserNumber());
+		friendInfoMapper.updateByExampleSelective(record, example);
+		return ResponseEntity.buildSuccessful();
+	}
+	
+	@Override
+	public boolean isFriend(String userNumber, String friendNumber) {
+		if(StringUtils.isBlank(userNumber)||StringUtils.isBlank(friendNumber)) {
+			throw new RuntimeException("参数错误");
+		}
+		if(userNumber.equals(friendNumber)) {
+			return true;
+		}
+		UserFriendInfoExample example = new UserFriendInfoExample();
+		example.createCriteria().andIsDeleteEqualTo(0).andUserNumberEqualTo(userNumber).andFriendNumberEqualTo(friendNumber);
+		if(friendInfoMapper.countByExample(example)>0) {
+			return true;
+		}else {
+			return false;
+		}
+		
+	}
+
+	@Override
+	public ResponseEntity queryFriendNum(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		if(StringUtils.isBlank(token)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = this.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		UserFriendInfoExample example = new UserFriendInfoExample();
+		example.createCriteria().andIsDeleteEqualTo(0).andUserNumberEqualTo(user.getUserNumber());
+		return ResponseEntity.buildSuccessful(friendInfoMapper.countByExample(example));
+		
 	}
 }

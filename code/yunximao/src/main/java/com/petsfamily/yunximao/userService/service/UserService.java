@@ -43,6 +43,30 @@ public interface UserService {
 	public ResponseEntity modifyUserHeadImg(JSONObject dataJson);
 	
 	/**
+	 * 添加关注
+	 * token
+	 * friendNumber
+	 * @return
+	 */
+	public ResponseEntity addFriend(JSONObject dataJson);
+	/**
+	 * 取消关注
+	 * token
+	 * friendNumber
+	 * @return
+	 */
+	public ResponseEntity deleFriend(JSONObject dataJson);
+	/**
+	 * 是否已关注
+	 * @param userNumber
+	 * @param friendNumber
+	 * @return
+	 */
+	public boolean isFriend(String userNumber,String friendNumber);
+	
+	public ResponseEntity queryFriendNum(JSONObject dataJson);
+	
+	/**
 	 * token
 	 * @return
 	 */
@@ -52,4 +76,7 @@ public interface UserService {
 	 * @return
 	 */
 	public UserInfo getUserInfoByCode(String Code);
+	
+	
+	
 }
