@@ -20,8 +20,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.petsfamily.yunximao.common.model.ResponseEntity;
 import com.petsfamily.yunximao.common.util.DateTimeUtil;
+import com.petsfamily.yunximao.common.util.PageUtil;
 import com.petsfamily.yunximao.userService.mybatis.dao.UserFriendInfoMapper;
 import com.petsfamily.yunximao.userService.mybatis.dao.UserInfoMapper;
+import com.petsfamily.yunximao.userService.mybatis.dao.UserMapper;
 import com.petsfamily.yunximao.userService.mybatis.dao.UserTokenInfoMapper;
 import com.petsfamily.yunximao.userService.mybatis.dao.WechatInfoMapper;
 import com.petsfamily.yunximao.userService.mybatis.model.UserFriendInfo;
@@ -36,7 +38,9 @@ import com.petsfamily.yunximao.userService.service.UserService;
 @Service
 public class UserServiceImpl implements UserService {
 	@Resource
-	private UserInfoMapper userMapper;
+	private UserInfoMapper userInfoMapper;
+	@Resource
+	private UserMapper userMapper;
 	@Resource
 	private UserFriendInfoMapper friendInfoMapper;
 	@Resource
@@ -77,9 +81,9 @@ public class UserServiceImpl implements UserService {
 				user.setUserType(1);
 				user.setStatus(1);
 				user.setRegistrationTime(new Date());
-				userMapper.insert(user);
+				userInfoMapper.insert(user);
 				user.setUserNumber(getUserNumber(user.getSeqId()));
-				userMapper.updateByPrimaryKeySelective(user);
+				userInfoMapper.updateByPrimaryKeySelective(user);
 				
 				WechatInfo wechat = new WechatInfo();
 				wechat.setIsDelete(0);
@@ -153,7 +157,7 @@ public class UserServiceImpl implements UserService {
 				userInfoExample.createCriteria()
 								.andIsDeleteEqualTo(0)
 								.andUserNumberEqualTo(wechats.get(0).getUserNumber());
-				List<UserInfo> userInfos = userMapper.selectByExample(userInfoExample);
+				List<UserInfo> userInfos = userInfoMapper.selectByExample(userInfoExample);
 				if(userInfos.isEmpty()) {
 					throw new RuntimeException("用户数据异常");
 				}else {
@@ -190,7 +194,7 @@ public class UserServiceImpl implements UserService {
 		}else {
 			UserInfoExample example = new UserInfoExample();
 			example.createCriteria().andIsDeleteEqualTo(0).andUserNumberEqualTo(code);
-			List<UserInfo> userInfos = userMapper.selectByExample(example);
+			List<UserInfo> userInfos = userInfoMapper.selectByExample(example);
 			if(userInfos.isEmpty()) {
 				return null;
 			}else {
@@ -238,7 +242,7 @@ public class UserServiceImpl implements UserService {
 		}
 		user.setUpdateDate(new Date());
 		user.setUpdateUser(user.getUserNumber());
-		userMapper.updateByPrimaryKeySelective(user);
+		userInfoMapper.updateByPrimaryKeySelective(user);
 		return ResponseEntity.buildSuccessful(user);
 	}
 
@@ -334,5 +338,27 @@ public class UserServiceImpl implements UserService {
 		example.createCriteria().andIsDeleteEqualTo(0).andUserNumberEqualTo(user.getUserNumber());
 		return ResponseEntity.buildSuccessful(friendInfoMapper.countByExample(example));
 		
+	}
+
+	@Override
+	public ResponseEntity queryFriends(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		String dataSize = dataJson.getString("dataSize");
+		if(StringUtils.isBlank(dataSize)||!StringUtils.isNumeric(dataSize)) {
+			dataSize = "0";
+		}
+		if(StringUtils.isBlank(token)) {
+			return ResponseEntity.buildFailly("参数错误"); 
+		}
+		UserInfo user = this.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		
+		JSONObject parameter = new JSONObject();
+		parameter.put("userNumber",user.getUserNumber());
+		parameter.put("offset", PageUtil.getOffset(Integer.valueOf(dataSize)));
+		parameter.put("limit", PageUtil.getLimit(Integer.valueOf(dataSize)));		
+		return ResponseEntity.buildSuccessful(userMapper.selectFriendsByPage(parameter));
 	}
 }

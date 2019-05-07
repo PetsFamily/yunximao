@@ -41,6 +41,9 @@ import com.petsfamily.yunximao.userService.mybatis.model.UserInfo;
 import com.petsfamily.yunximao.userService.service.UserService;
 @Service
 public class MomentsServiceImpl implements MomentsService {
+	private JSONArray hotKeyWord;
+	
+	private String hotSeach;
 	@Resource
 	private MomentsMapper momentsMapper;
 	@Resource
@@ -241,47 +244,64 @@ public class MomentsServiceImpl implements MomentsService {
 		}
 	}
 
+	@Override
+	public ResponseEntity queryHotSeach(JSONObject dataJson) {
+		if(this.hotSeach!=null) {
+			return ResponseEntity.buildSuccessful(this.hotSeach);
+		}else {
+			return ResponseEntity.buildSuccessful("热搜：卡夫卡");
+		}
+		
+	}
+	
 	
 	@Override
 	public ResponseEntity queryHotKeyWord(JSONObject dataJson) {
-		JSONArray datas = new JSONArray();
-		JSONObject 大橘为重 = new JSONObject();
-		大橘为重.put("text","大橘为重");
-		JSONObject 瓜子蛇精脸 = new JSONObject();
-		瓜子蛇精脸.put("text","瓜子蛇精脸");
-		JSONObject 包子脸 = new JSONObject();
-		包子脸.put("text","包子脸");
-		JSONObject 蓝精灵 = new JSONObject();
-		蓝精灵.put("text","蓝精灵");
-		JSONObject 黑煤球 = new JSONObject();
-		黑煤球.put("text","黑煤球");
-		JSONObject 纯血贵族 = new JSONObject();
-		纯血贵族.put("text","纯血贵族");
-		JSONObject 白雪公主 = new JSONObject();
-		白雪公主.put("text","白雪公主");
-		JSONObject 小肥脸 = new JSONObject();
-		小肥脸.put("text","小肥脸");
-		JSONObject 飘逸长发 = new JSONObject();
-		飘逸长发.put("text","飘逸长发");
-		JSONObject 呆萌小宝贝 = new JSONObject();
-		呆萌小宝贝.put("text","呆萌小宝贝");
-		JSONObject 小主子 = new JSONObject();
-		小主子.put("text","小主子");
+		if(this.hotKeyWord!=null) {
+			return ResponseEntity.buildSuccessful(this.hotKeyWord);
+		}else{
+			JSONArray datas = new JSONArray();
+			JSONObject 大橘为重 = new JSONObject();
+			大橘为重.put("text","大橘为重");
+			JSONObject 瓜子蛇精脸 = new JSONObject();
+			瓜子蛇精脸.put("text","瓜子蛇精脸");
+			JSONObject 包子脸 = new JSONObject();
+			包子脸.put("text","包子脸");
+			JSONObject 蓝精灵 = new JSONObject();
+			蓝精灵.put("text","蓝精灵");
+			JSONObject 黑煤球 = new JSONObject();
+			黑煤球.put("text","黑煤球");
+			JSONObject 纯血贵族 = new JSONObject();
+			纯血贵族.put("text","纯血贵族");
+			JSONObject 白雪公主 = new JSONObject();
+			白雪公主.put("text","白雪公主");
+			JSONObject 小肥脸 = new JSONObject();
+			小肥脸.put("text","小肥脸");
+			JSONObject 飘逸长发 = new JSONObject();
+			飘逸长发.put("text","飘逸长发");
+			JSONObject 呆萌小宝贝 = new JSONObject();
+			呆萌小宝贝.put("text","呆萌小宝贝");
+			JSONObject 小主子 = new JSONObject();
+			小主子.put("text","小主子");
+			
+			
+			datas.add(大橘为重);
+			datas.add(瓜子蛇精脸);
+			datas.add(包子脸);
+			datas.add(蓝精灵);
+			datas.add(黑煤球);
+			datas.add(纯血贵族);
+			datas.add(白雪公主);
+			datas.add(小肥脸);
+			datas.add(飘逸长发);
+			datas.add(呆萌小宝贝);
+			datas.add(小主子);
+			return ResponseEntity.buildSuccessful(datas);
+		}
 		
-		
-		datas.add(大橘为重);
-		datas.add(瓜子蛇精脸);
-		datas.add(包子脸);
-		datas.add(蓝精灵);
-		datas.add(黑煤球);
-		datas.add(纯血贵族);
-		datas.add(白雪公主);
-		datas.add(小肥脸);
-		datas.add(飘逸长发);
-		datas.add(呆萌小宝贝);
-		datas.add(小主子);
-		return ResponseEntity.buildSuccessful(datas);
 	}
+	
+	
 
 	@Override
 	@Transactional(rollbackFor={Throwable.class,RuntimeException.class} ,propagation=Propagation.REQUIRED)
@@ -737,4 +757,107 @@ public class MomentsServiceImpl implements MomentsService {
 		example.createCriteria().andIsDeleteEqualTo(0).andUserNumberEqualTo(user.getUserNumber());
 		return ResponseEntity.buildSuccessful(momentsInfoMapper.countByExample(example));
 	}
+
+	@Override
+	public ResponseEntity deleMoment(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		String momentNumber = dataJson.getString("momentNumber");
+		if(StringUtils.isBlank(token)||StringUtils.isBlank(momentNumber)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = userService.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		
+		PetMomentsInfoExample momentsInfoExample = new PetMomentsInfoExample();
+		momentsInfoExample.createCriteria().andIsDeleteEqualTo(0).andMomentNumberEqualTo(momentNumber);
+		List<PetMomentsInfo> momentsInfos = momentsInfoMapper.selectByExample(momentsInfoExample);
+		if(momentsInfos.isEmpty()) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		
+		if(!momentsInfos.get(0).getUserNumber().equals(user.getUserNumber())) {
+			return ResponseEntity.buildFailly("数据权限异常");
+		}
+		
+		momentsInfos.get(0).setIsDelete(1);
+		momentsInfos.get(0).setUpdateUser(user.getUserNumber());
+		momentsInfos.get(0).setUpdateDate(new Date());
+		
+		momentsInfoMapper.updateByPrimaryKeySelective(momentsInfos.get(0));
+		
+		return ResponseEntity.buildSuccessful();
+	}
+
+	@Override
+	public ResponseEntity updateMoment(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		String momentNumber = dataJson.getString("momentNumber");
+		String title = dataJson.getString("title");
+		String keyWord = dataJson.getString("keyWord");
+		
+		if(StringUtils.isBlank(token)||StringUtils.isBlank(momentNumber)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = userService.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		
+		PetMomentsInfoExample momentsInfoExample = new PetMomentsInfoExample();
+		momentsInfoExample.createCriteria().andIsDeleteEqualTo(0).andMomentNumberEqualTo(momentNumber);
+		List<PetMomentsInfo> momentsInfos = momentsInfoMapper.selectByExample(momentsInfoExample);
+		if(momentsInfos.isEmpty()) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		
+		if(!momentsInfos.get(0).getUserNumber().equals(user.getUserNumber())) {
+			return ResponseEntity.buildFailly("数据权限异常");
+		}
+		
+		if(!audit.auditText(title)) {
+			return ResponseEntity.buildFailly("输入内容有违规情况");
+		}
+		
+		momentsInfos.get(0).setUpdateUser(user.getUserNumber());
+		momentsInfos.get(0).setUpdateDate(new Date());
+		momentsInfos.get(0).setMomentTitle(title);
+		momentsInfos.get(0).setKeyWord(keyWord);
+		momentsInfoMapper.updateByPrimaryKeySelective(momentsInfos.get(0));
+		return ResponseEntity.buildSuccessful();
+	}
+
+	@Override
+	public ResponseEntity initHotKeyWord(JSONObject dataJson) {
+		String adminKey = dataJson.getString("adminKey");
+		JSONArray hotKeyWord = dataJson.getJSONArray("hotKeyWord");
+		if(StringUtils.isBlank(adminKey)) {
+			return ResponseEntity.buildFailly("权限错误");
+		}
+		if(hotKeyWord==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		this.hotKeyWord = hotKeyWord;
+		
+		return ResponseEntity.buildSuccessful();
+	}
+
+	@Override
+	public ResponseEntity initHotSeach(JSONObject dataJson) {
+		String adminKey = dataJson.getString("adminKey");
+		String hotSeach = dataJson.getString("hotSeach");
+		if(StringUtils.isBlank(adminKey)) {
+			return ResponseEntity.buildFailly("权限错误");
+		}
+		if(StringUtils.isBlank(hotSeach)) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
+		this.hotSeach = hotSeach;
+		
+		return ResponseEntity.buildSuccessful();
+	}
+
+	
+	
 }

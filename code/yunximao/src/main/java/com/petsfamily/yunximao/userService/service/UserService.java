@@ -56,6 +56,14 @@ public interface UserService {
 	 * @return
 	 */
 	public ResponseEntity deleFriend(JSONObject dataJson);
+	
+	/**
+	 * 查询关注列表
+	 * token
+	 * friendNumber
+	 * @return
+	 */
+	public ResponseEntity queryFriends(JSONObject dataJson);
 	/**
 	 * 是否已关注
 	 * @param userNumber

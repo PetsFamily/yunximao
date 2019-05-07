@@ -27,6 +27,14 @@ public interface MomentsService {
 	 * @return
 	 */
 	public ResponseEntity queryHotKeyWord(JSONObject dataJson);
+	
+	/**
+	 * 查询热搜
+	 * @param dataJson
+	 * @return
+	 */
+	public ResponseEntity queryHotSeach(JSONObject dataJson);
+	
 	/**
 	 * 查询精彩瞬间详情
 	 * @param
@@ -112,4 +120,11 @@ public interface MomentsService {
 	
 	public ResponseEntity queryMomentNum(JSONObject dataJson);
 	
+	public ResponseEntity deleMoment(JSONObject dataJson);
+	
+	public ResponseEntity updateMoment(JSONObject dataJson);
+	
+	public ResponseEntity initHotKeyWord(JSONObject dataJson);
+	
+	public ResponseEntity initHotSeach(JSONObject dataJson);	
 }

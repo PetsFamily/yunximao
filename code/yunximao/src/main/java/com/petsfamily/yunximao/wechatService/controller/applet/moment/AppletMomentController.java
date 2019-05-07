@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.petsfamily.yunximao.common.model.BaseController;
 import com.petsfamily.yunximao.common.model.ResponseEntity;
@@ -95,6 +96,13 @@ public class AppletMomentController extends BaseController{
 		return momentsService.queryHotKeyWord(dataJson);
 	}
 	
+	
+	@RequestMapping(value = "/moment/queryHotSeach", method = {RequestMethod.POST })
+	public ResponseEntity queryHotSeach(@RequestBody JSONObject dataJson) throws Exception {
+		logger.debug(dataJson.toJSONString());
+		return momentsService.queryHotSeach(dataJson);
+	}
+	
 	@RequestMapping(value="/moment/submitPic", method = { RequestMethod.POST})
     public ResponseEntity submitPic(@RequestParam("file") MultipartFile file,
     								@RequestParam("token") String token,
@@ -133,6 +141,40 @@ public class AppletMomentController extends BaseController{
 		dataJson.put("keyWord", keyWord);
 		dataJson.put("music",music);
 		return momentsService.submitVideo(dataJson);
+	}
+	
+	@RequestMapping(value="/moment/deleMoment", method = { RequestMethod.POST})
+    public ResponseEntity deleMoment(@RequestBody JSONObject dataJson) {
+		String id = dataJson.getString("id");
+		String token = dataJson.getString("token");
+		dataJson = new JSONObject();
+		dataJson.put("token",token);
+		dataJson.put("momentNumber",id);
+		return momentsService.deleMoment(dataJson);
+	}
+	
+	@RequestMapping(value="/moment/updateMoment", method = { RequestMethod.POST})
+    public ResponseEntity updateMoment(@RequestBody JSONObject dataJson) {
+		String id = dataJson.getString("id");
+		String token = dataJson.getString("token");
+		String title = dataJson.getString("title");
+		String keyWord = dataJson.getString("keyWord");
+		dataJson = new JSONObject();
+		dataJson.put("token",token);
+		dataJson.put("momentNumber",id);
+		dataJson.put("title",title);
+		dataJson.put("keyWord",keyWord);
+		return momentsService.updateMoment(dataJson);
+	}
+	
+	@RequestMapping(value="/moment/initHotKeyWord", method = { RequestMethod.POST})
+    public ResponseEntity initHotKeyWord(@RequestBody JSONObject dataJson) {
+		return momentsService.initHotKeyWord(dataJson);
+	}
+	
+	@RequestMapping(value="/moment/initHotSeach", method = { RequestMethod.POST})
+    public ResponseEntity initHotSeach(@RequestBody JSONObject dataJson) {
+		return momentsService.initHotSeach(dataJson);
 	}
 	
 	

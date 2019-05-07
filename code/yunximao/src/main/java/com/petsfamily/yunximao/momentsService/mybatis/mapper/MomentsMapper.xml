@@ -5,6 +5,7 @@
 			SELECT 
 				pm.moment_number as id,
 				pm.moment_content as momentContent,
+				pm.moment_video as momentVideo,
 				pm.moment_type as momentType,
 				pm.moment_title as title,
 				ui.avatar_url as head,
@@ -14,7 +15,8 @@
 				case
 					when likeLog.seq_id is not null then '1'
 					else '0'
-				end as isLike
+				end as isLike,
+				pm.key_word as keyWord
 				FROM 
 				pet_moments_info pm
 			left join user_info ui on pm.user_number = ui.user_number
@@ -23,9 +25,12 @@
 			</if>
 			where pm.is_delete = 0 and pm.is_pass = 1
 			<if test="seach != null" >
-				and (pm.moment_title like  CONCAT('%','${seach}','%' ) 
-				or pm.key_word like  CONCAT('%','${seach}','%' )
-				or ui.user_name like  CONCAT('%','${seach}','%' ))
+				and (
+					pm.moment_title like  CONCAT('%','${seach}','%' ) 
+					or pm.key_word like  CONCAT('%','${seach}','%' )
+					or ui.user_name like  CONCAT('%','${seach}','%' )
+					or ui.user_number = #{seach}
+				)
 			</if>
 			order by pm.seq_id desc
 			<if test="limit != null">
