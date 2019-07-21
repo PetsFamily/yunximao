@@ -137,6 +137,13 @@ public class UserInfo implements Serializable {
      */
     private Date updateDate;
 
+    /**
+     * 是否管理员
+     * 表 : user_info
+     * 对应字段 : is_admin
+     */
+    private Integer isAdmin;
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -482,6 +489,24 @@ public class UserInfo implements Serializable {
     }
 
     /**
+     * get method 
+     *
+     * @return user_info.is_admin：是否管理员
+     */
+    public Integer getIsAdmin() {
+        return isAdmin;
+    }
+
+    /**
+     * set method 
+     *
+     * @param isAdmin  是否管理员
+     */
+    public void setIsAdmin(Integer isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    /**
      *
      */
     @Override
@@ -509,6 +534,7 @@ public class UserInfo implements Serializable {
         sb.append(", updateUser=").append(updateUser);
         sb.append(", createDate=").append(createDate);
         sb.append(", updateDate=").append(updateDate);
+        sb.append(", isAdmin=").append(isAdmin);
         sb.append("]");
         return sb.toString();
     }

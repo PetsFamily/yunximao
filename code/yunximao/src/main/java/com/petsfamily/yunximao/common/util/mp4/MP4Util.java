@@ -21,8 +21,10 @@ import com.googlecode.mp4parser.authoring.tracks.AACTrackImpl;
 import com.googlecode.mp4parser.authoring.tracks.CroppedTrack;
 
 import ws.schild.jave.AudioAttributes;
+import ws.schild.jave.AudioInfo;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.EncodingAttributes;
+import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.MultimediaObject;
 import ws.schild.jave.VideoAttributes;
 import ws.schild.jave.VideoSize;
@@ -173,26 +175,21 @@ public class MP4Util {
 	        return result;
 	    }
 	 
-	 public static File getCompressVideo(File source) {
+	 public static VideoSize getVideoSize(File source) {
 		 try {
 			 File out = File.createTempFile(UUID.randomUUID().toString(),"mp4");
-			 AudioAttributes audio = new AudioAttributes();
-	         audio.setCodec("libmp3lame");
-	         audio.setBitRate(new Integer(56000));
-	         audio.setChannels(new Integer(1));
-	         audio.setSamplingRate(new Integer(22050));
-	         VideoAttributes video = new VideoAttributes();
-	         video.setCodec("mpeg4");
-	         video.setBitRate(new Integer(1000000));
-	         video.setFrameRate(new Integer(24));
-	         EncodingAttributes attrs = new EncodingAttributes();
-	         attrs.setFormat("mp4");
-	         attrs.setAudioAttributes(audio);
-	         attrs.setVideoAttributes(video);
-	         Encoder encoder = new Encoder();
-	         MultimediaObject multimediaObject  = new MultimediaObject(source);
-	         encoder.encode(multimediaObject, out, attrs);
-	         return out;
+			 MultimediaObject multimediaObject = new MultimediaObject(source);
+             VideoAttributes video = new VideoAttributes();
+             video.setCodec("mpeg4");
+             video.setBitRate(new Integer(800000));
+             video.setFrameRate(new Integer(15));
+             EncodingAttributes attrs = new EncodingAttributes();
+             attrs.setFormat("mp4");
+             attrs.setVideoAttributes(video);
+             Encoder encoder = new Encoder();
+             encoder.encode(multimediaObject, out, attrs);
+             multimediaObject = new MultimediaObject(out);
+             return multimediaObject.getInfo().getVideo().getSize();
 		 }catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("文件压缩异常");
@@ -205,14 +202,18 @@ public class MP4Util {
 			  MultimediaObject multimediaObject  = new MultimediaObject(source);
 			  File out = File.createTempFile(UUID.randomUUID().toString(),"png");
 			  VideoAttributes video = new VideoAttributes();  
-			  video.setCodec("png");//转图片  
-		      video.setSize(multimediaObject.getInfo().getVideo().getSize());  
+			  video.setCodec("png");//转图片
+			  //int width = multimediaObject.getInfo().getVideo().getSize().getWidth();
+			  //int height = multimediaObject.getInfo().getVideo().getSize().getHeight();
+			  //int width = Integer.min(multimediaObject.getInfo().getVideo().getSize().getWidth(),multimediaObject.getInfo().getVideo().getSize().getHeight());
+			  //int height = Integer.max(multimediaObject.getInfo().getVideo().getSize().getWidth(),multimediaObject.getInfo().getVideo().getSize().getHeight());
+			  //VideoSize size = new VideoSize(width,height);
+		      video.setSize(MP4Util.getVideoSize(source));  
 		      EncodingAttributes attrs = new EncodingAttributes();  
 		      attrs.setFormat("image2");//转图片  
 		      attrs.setOffset(1f);//设置偏移位置，即开始转码位置（3秒）
 		      attrs.setDuration(0.01f);//设置转码持续时间（1秒）  
-		      attrs.setVideoAttributes(video);  
-		      
+		      attrs.setVideoAttributes(video);
 		      Encoder encoder = new Encoder();  
 		      encoder.encode(multimediaObject,out, attrs);  
 		      return out;

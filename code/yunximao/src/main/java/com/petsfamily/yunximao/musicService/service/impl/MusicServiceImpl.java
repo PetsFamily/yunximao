@@ -57,11 +57,20 @@ public class MusicServiceImpl implements MusicService {
 	public ResponseEntity queryMyMusicByPage(JSONObject dataJson) {
 		String dataSize = dataJson.getString("dataSize");
 		String seach = dataJson.getString("seach");
+		String token = dataJson.getString("token");//预留埋点
 		if(StringUtils.isBlank(dataSize)||!StringUtils.isNumeric(dataSize)) {
 			dataSize = "0";
 		}
+		if(StringUtils.isBlank(token)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = userService.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}
 		JSONObject parameter = new JSONObject();
 		parameter.put("seach",seach);
+		parameter.put("userNumber",user.getUserNumber());
 		parameter.put("offset", PageUtil.getOffset(Integer.valueOf(dataSize)));
 		parameter.put("limit", PageUtil.getLimit(Integer.valueOf(dataSize)));
 		return ResponseEntity.buildSuccessful(musicMapper.selectMyMusicByPage(parameter));

@@ -78,6 +78,16 @@ public class AppletMomentController extends BaseController{
 		return momentsService.likeMoment(dataJson);
 	}
 	
+	@RequestMapping(value = "/moment/refuse", method = {RequestMethod.POST })
+	public ResponseEntity refuse(@RequestBody JSONObject dataJson) throws Exception {
+		String id = dataJson.getString("id");
+		String token = dataJson.getString("token");
+		dataJson = new JSONObject();
+		dataJson.put("token",token);
+		dataJson.put("momentNumber",id);
+		return momentsService.refuseMoment(dataJson);
+	}
+	
 	@RequestMapping(value = "/moment/submitComments", method = {RequestMethod.POST })
 	public ResponseEntity submitComments(@RequestBody JSONObject dataJson) throws Exception {
 		String id = dataJson.getString("id");
@@ -89,6 +99,18 @@ public class AppletMomentController extends BaseController{
 		dataJson.put("comments",comments);
 		return momentsService.submitComments(dataJson);
 	}
+	
+	@RequestMapping(value = "/moment/deleteComments", method = {RequestMethod.POST })
+	public ResponseEntity deleteComments(@RequestBody JSONObject dataJson) throws Exception {
+		String id = dataJson.getString("id");
+		String token = dataJson.getString("token");
+		dataJson = new JSONObject();
+		dataJson.put("token",token);
+		dataJson.put("commentNumber",id);
+		return momentsService.deleteComments(dataJson);
+	}
+	
+	
 
 	@RequestMapping(value = "/moment/queryHotKeyWord", method = {RequestMethod.POST })
 	public ResponseEntity queryHotKeyWord(@RequestBody JSONObject dataJson) throws Exception {

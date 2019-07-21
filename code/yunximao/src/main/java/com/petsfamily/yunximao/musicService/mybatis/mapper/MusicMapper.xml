@@ -65,6 +65,9 @@
 			and (music_title like  CONCAT('%','${seach}','%' ) 
 			or singer like  CONCAT('%','${seach}','%' ))
 		</if>
+		<if test="userNumber != null" >
+		    and mci.user_number = #{userNumber}
+		</if>
 		order by mi.seq_id desc
 		<if test="limit != null">
      		<if test="offset != null">

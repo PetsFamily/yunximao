@@ -30,6 +30,7 @@ import com.petsfamily.yunximao.momentsService.mybatis.dao.PetMomentsInfoMapper;
 import com.petsfamily.yunximao.momentsService.mybatis.dao.PetMomentsLikeLogMapper;
 import com.petsfamily.yunximao.momentsService.mybatis.dao.PetMomentsReadLogMapper;
 import com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsCommentsInfo;
+import com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsCommentsInfoExample;
 import com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsInfo;
 import com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsInfoExample;
 import com.petsfamily.yunximao.momentsService.mybatis.model.PetMomentsLikeLog;
@@ -201,6 +202,36 @@ public class MomentsServiceImpl implements MomentsService {
 		}
 	}
 	
+	
+	@Override
+	@Transactional(rollbackFor={Throwable.class,RuntimeException.class} ,propagation=Propagation.REQUIRED)
+	public ResponseEntity refuseMoment(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		String momentNumber = dataJson.getString("momentNumber");
+		if(StringUtils.isBlank(momentNumber)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		if(StringUtils.isBlank(token)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = userService.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}else {
+			if(!Integer.valueOf("1").equals(user.getIsAdmin())) {
+				return ResponseEntity.buildFailly("权限不足");
+			}
+			PetMomentsInfo record = new PetMomentsInfo();
+			record.setIsPass(0);
+			record.setUpdateDate(new Date());
+			record.setUpdateUser(user.getUserNumber());
+			PetMomentsInfoExample example = new PetMomentsInfoExample();
+			example.createCriteria().andMomentNumberEqualTo(momentNumber);
+			momentsInfoMapper.updateByExampleSelective(record, example);
+			return ResponseEntity.buildSuccessful(); 
+		}
+	}
+	
 	@Override
 	@Transactional(rollbackFor={Throwable.class,RuntimeException.class} ,propagation=Propagation.REQUIRED)
 	public ResponseEntity submitComments(JSONObject dataJson) {
@@ -244,6 +275,34 @@ public class MomentsServiceImpl implements MomentsService {
 		}
 	}
 
+	@Override
+	public ResponseEntity deleteComments(JSONObject dataJson) {
+		String token = dataJson.getString("token");//预留埋点
+		String commentNumber = dataJson.getString("commentNumber");
+		if(StringUtils.isBlank(commentNumber)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		if(StringUtils.isBlank(token)) {
+			return ResponseEntity.buildFailly("参数错误");
+		}
+		UserInfo user = userService.getUserInfoByToken(token);
+		if(user==null) {
+			return ResponseEntity.buildFailly("数据错误");
+		}else {
+			if(!Integer.valueOf("1").equals(user.getIsAdmin())) {
+				return ResponseEntity.buildFailly("权限不足");
+			}
+			PetMomentsCommentsInfo record = new PetMomentsCommentsInfo();
+			record.setIsDelete(1);
+			record.setUpdateDate(new Date());
+			record.setUpdateUser(user.getUserNumber());
+			PetMomentsCommentsInfoExample example = new PetMomentsCommentsInfoExample();
+			example.createCriteria().andCommentNumberEqualTo(commentNumber);
+			commentsInfoMapper.updateByExampleSelective(record, example);
+			return ResponseEntity.buildSuccessful();
+		}
+	}
+	
 	@Override
 	public ResponseEntity queryHotSeach(JSONObject dataJson) {
 		if(this.hotSeach!=null) {
@@ -499,7 +558,7 @@ public class MomentsServiceImpl implements MomentsService {
 			if(StringUtils.isNotBlank(music)&&"mp4".equals(name.split("\\.")[1].toLowerCase())) {//有背景音乐 且 视频格式为MP4 则合成 
 				//合成视频
 				File mp3 = fileUtil.getByAliOSS("music/"+music+".aac");
-			    File mp4 = MP4Util.getCompressVideo(source);
+			    File mp4 = source;
 			    File outMap4 = File.createTempFile(moment.getMomentNumber(),"mp4");
 			    MP4Util.joinVideo(mp4, mp3, outMap4);
 			    String  outUrl = "";
@@ -533,7 +592,7 @@ public class MomentsServiceImpl implements MomentsService {
 				String url = "";
 				File out = source;
 				if("mp4".equals(name.split("\\.")[1].toLowerCase())) {
-					out = MP4Util.getCompressVideo(source);
+					out = source;
 					try {
 						url = fileUtil.saveByAliOSS(module+"/"+name,new FileInputStream(out));
 					}catch (Exception e) {
@@ -561,6 +620,8 @@ public class MomentsServiceImpl implements MomentsService {
 					moment.setTaskId(auditRtn.getString("taskId"));
 					if(200 != auditRtn.getInteger("code")) {//同步失败 直接 认定 不通过
 						moment.setIsPass(0);
+					}else {
+						moment.setIsPass(1);//默认成功
 					}
 					momentsInfoMapper.updateByPrimaryKeySelective(moment);
 				}else {
@@ -857,7 +918,5 @@ public class MomentsServiceImpl implements MomentsService {
 		
 		return ResponseEntity.buildSuccessful();
 	}
-
-	
 	
 }

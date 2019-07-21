@@ -63,7 +63,7 @@
         </javaClientGenerator>
 
         <!--对应数据库表 mysql可以加入主键自增 字段命名 忽略某字段等-->
-        <table tableName="user_friend_info">
+        <table tableName="user_info">
             <generatedKey column="seq_id" sqlStatement="Mysql"	identity="true" />
         </table>
     </context>

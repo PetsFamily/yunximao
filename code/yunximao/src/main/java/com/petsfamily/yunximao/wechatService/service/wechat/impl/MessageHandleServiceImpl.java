@@ -40,6 +40,7 @@ public class MessageHandleServiceImpl implements MessageHandleService {
                 return null;
             }else {
                 result = XmlUtil.toXml(resp.getObject());
+                logger.debug(result);
             }
         } else {
             result = "msg is wrong";

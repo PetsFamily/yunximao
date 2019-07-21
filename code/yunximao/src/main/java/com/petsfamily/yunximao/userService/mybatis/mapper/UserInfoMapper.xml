@@ -24,6 +24,7 @@
     <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
     <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
     <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="is_admin" jdbcType="INTEGER" property="isAdmin" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <!--
@@ -95,7 +96,7 @@
     -->
     seq_id, user_number, user_name, avatar_url, gender, birthday, mobile, email, real_name, 
     id_number, user_type, status, registration_time, is_delete, remark, create_user, 
-    update_user, create_date, update_date
+    update_user, create_date, update_date, is_admin
   </sql>
   <select id="selectByExample" parameterType="com.petsfamily.yunximao.userService.mybatis.model.UserInfoExample" resultMap="BaseResultMap">
     <!--
@@ -159,15 +160,15 @@
       email, real_name, id_number, 
       user_type, status, registration_time, 
       is_delete, remark, create_user, 
-      update_user, create_date, update_date
-      )
+      update_user, create_date, update_date, 
+      is_admin)
     values (#{userNumber,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{avatarUrl,jdbcType=VARCHAR}, 
       #{gender,jdbcType=VARCHAR}, #{birthday,jdbcType=TIMESTAMP}, #{mobile,jdbcType=VARCHAR}, 
       #{email,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR}, #{idNumber,jdbcType=VARCHAR}, 
       #{userType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{registrationTime,jdbcType=TIMESTAMP}, 
       #{isDelete,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
-      #{updateUser,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}
-      )
+      #{updateUser,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{isAdmin,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.petsfamily.yunximao.userService.mybatis.model.UserInfo">
     <!--
@@ -232,6 +233,9 @@
       <if test="updateDate != null">
         update_date,
       </if>
+      <if test="isAdmin != null">
+        is_admin,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="userNumber != null">
@@ -287,6 +291,9 @@
       </if>
       <if test="updateDate != null">
         #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isAdmin != null">
+        #{isAdmin,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -362,6 +369,9 @@
       <if test="record.updateDate != null">
         update_date = #{record.updateDate,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.isAdmin != null">
+        is_admin = #{record.isAdmin,jdbcType=INTEGER},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -390,7 +400,8 @@
       create_user = #{record.createUser,jdbcType=VARCHAR},
       update_user = #{record.updateUser,jdbcType=VARCHAR},
       create_date = #{record.createDate,jdbcType=TIMESTAMP},
-      update_date = #{record.updateDate,jdbcType=TIMESTAMP}
+      update_date = #{record.updateDate,jdbcType=TIMESTAMP},
+      is_admin = #{record.isAdmin,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -455,6 +466,9 @@
       <if test="updateDate != null">
         update_date = #{updateDate,jdbcType=TIMESTAMP},
       </if>
+      <if test="isAdmin != null">
+        is_admin = #{isAdmin,jdbcType=INTEGER},
+      </if>
     </set>
     where seq_id = #{seqId,jdbcType=INTEGER}
   </update>
@@ -480,7 +494,8 @@
       create_user = #{createUser,jdbcType=VARCHAR},
       update_user = #{updateUser,jdbcType=VARCHAR},
       create_date = #{createDate,jdbcType=TIMESTAMP},
-      update_date = #{updateDate,jdbcType=TIMESTAMP}
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      is_admin = #{isAdmin,jdbcType=INTEGER}
     where seq_id = #{seqId,jdbcType=INTEGER}
   </update>
 </mapper>

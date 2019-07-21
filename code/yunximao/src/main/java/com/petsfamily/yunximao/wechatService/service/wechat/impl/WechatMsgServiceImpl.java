@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.petsfamily.yunximao.common.util.DateTimeUtil;
+import com.petsfamily.yunximao.wechatService.common.model.NewsMessage;
 import com.petsfamily.yunximao.wechatService.common.model.TextMessage;
 import com.petsfamily.yunximao.wechatService.common.model.WeChatBaseMessage;
 import com.petsfamily.yunximao.wechatService.common.model.WeChatResult;
@@ -158,13 +159,21 @@ public class WechatMsgServiceImpl implements WechatMsgService {
         	 try {
         		//JSONObject user = wechatInterfaseService.getUserInfo(openId);
         		//logger.debug(user.toJSONString());
-        		TextMessage text = new TextMessage();
-  		        text.setContent("欢迎光临,精彩尽请期待!");// 自动回复
+        		StringBuffer articles = new StringBuffer();
+        		articles.append("<item>")
+        			    .append("<Title><![CDATA[卡柔和卡夫卡]]></Title>")
+        				.append("<Description><![CDATA[从卡柔共处的蔓枝上摘些小花放进袋子里，不让那些回忆湮灭。]]></Description>")
+        				.append("<PicUrl><![CDATA[https://mmbiz.qpic.cn/mmbiz_jpg/Krs9yaDcYcibXOBmib4T8ia7jb9UjaWLib7eOnJib1hxjxuXu7NIiawdibEyKDhXDWlX36IwlaDkXsF1m8ITUfQPTMU0g/0?wx_fmt=jpeg]]></PicUrl>")
+        				.append("<Url><![CDATA[https://mp.weixin.qq.com/s/xeIwkyNNXu9x3EBVQNHGxQ]]></Url>")
+        				.append("</item>");	 
+        		NewsMessage text = new NewsMessage();
+        		text.setArticleCount(1);
+  		        text.setArticles(articles.toString());// 自动回复
   		        text.setCreateTime(DateTimeUtil.currentTime());
   		        text.setToUserName(msgInfo.getFromUserName());
   		        text.setFromUserName(msgInfo.getToUserName());
   		        text.setMsgId(msgInfo.getMsgId());
-  		        text.setMsgType("text");
+  		        text.setMsgType("news");
   		        result.setObject(text);
         	 }catch (Exception e) {
 				e.printStackTrace();

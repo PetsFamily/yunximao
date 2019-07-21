@@ -164,9 +164,12 @@ public class XmlUtil {
         	for (Field field: fields) {
         		field.setAccessible(true);
                 buffer.append("<" + field.getName() + ">");
-                buffer.append("<![CDATA[" + field.get(object) + "]]>");
+                if(String.valueOf(field.get(object)).startsWith("<item>")&&String.valueOf(field.get(object)).endsWith("</item>")){
+                	buffer.append(field.get(object));
+                }else {
+                	buffer.append("<![CDATA[" + field.get(object) + "]]>");
+                }     
                 buffer.append("</" + field.getName() + ">");
-               
             }
         }
         buffer.append("</xml>");

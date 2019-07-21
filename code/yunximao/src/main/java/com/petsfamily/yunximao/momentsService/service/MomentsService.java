@@ -59,6 +59,15 @@ public interface MomentsService {
 	 * @return
 	 */
 	public ResponseEntity likeMoment(JSONObject dataJson);
+	
+	/**
+	 * 审核拒绝
+	 * @param
+	 * momentNumber
+	 * token
+	 * @return
+	 */
+	public ResponseEntity refuseMoment(JSONObject dataJson);
 	/**
 	 * 评论
 	 * @param
@@ -68,6 +77,15 @@ public interface MomentsService {
 	 * @return
 	 */
 	public ResponseEntity submitComments(JSONObject dataJson);
+	/**
+	 * 删除评论
+	 * @param
+	 * momentNumber
+	 * token
+	 * comments 评论内容
+	 * @return
+	 */
+	public ResponseEntity deleteComments(JSONObject dataJson);
 	
 	/**
 	 * 发布图片
