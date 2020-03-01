@@ -10,6 +10,7 @@
 				pm.moment_title as title,
 				ui.avatar_url as head,
 				ui.user_name as userName,
+				ui.user_number as userNumber,
 				pm.like_count as likeCount,
 				pm.comments_count as commentsCount,
 				case
@@ -79,7 +80,8 @@
 			   mc.comment_content as content,
 			   mc.create_date as commentDate,
 			   ui.avatar_url as head,
-			   ui.user_name as userName
+			   ui.user_name as userName,
+			   ui.user_number as userNumber
 			from 
 			pet_moments_comments_info mc 
 			left join user_info ui on mc.user_number = ui.user_number
